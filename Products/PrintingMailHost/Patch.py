@@ -1,4 +1,6 @@
+import os
 import email.Parser
+from datetime import datetime
 try:
     from email.message import Message
 except ImportError:
@@ -11,6 +13,7 @@ from Products.MailHost.MailHost import MailBase
 from StringIO import StringIO
 
 PATCH_PREFIX = '_monkey_'
+SAVETO = os.environ.get('PRINTING_MAILHOST_SAVETO', None)
 
 __refresh_module__ = 0
 
@@ -78,7 +81,22 @@ class PrintingMailHost:
         if base64_note:
             print >> out, base64_note
             print >> out, ""
-        LOG.info(out.getvalue())
+        value = out.getvalue()
+        LOG.info(value)
+        if os.path.isdir(SAVETO) and os.access(SAVETO, os.W_OK):
+            now = datetime.now().strftime('%Y%M%d-%H%M%S-%f.log')
+            fname = os.path.join(SAVETO, now)
+            open(fname, 'w').write(value)
+
+if SAVETO is not None:
+    if os.path.isdir(SAVETO) and os.access(SAVETO, os.W_OK):
+        saveto_text = '\nE-mails will be saved to {0}\n'.format(SAVETO)
+    elif os.path.isdir(SAVETO) and not os.access(SAVETO, os.W_OK):
+        saveto_text = "\nE-mails can't be saved to {0}. The directory is not writeable.\n".format(SAVETO)
+    elif not os.path.isdir(SAVETO):
+        saveto_text = "\nE-mails can't be saved to {0}. The directory does not exist.\n".format(SAVETO)
+else:
+    saveto_text = ''
 
 
 LOG.warn("""
@@ -89,12 +107,12 @@ Monkey patching MailHosts to print emails to the terminal instead of
 sending them.
 
 NO MAIL WILL BE SENT FROM ZOPE AT ALL!
-
+%s
 Turn off debug mode or remove PrintingMailHost from the Products
 directory to turn this off.
 
 ******************************************************************************
-""")
+""", saveto_text)
 
 monkeyPatch(MailBase, PrintingMailHost)
 

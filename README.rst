@@ -7,7 +7,8 @@ This product, when installed, will check if Zope is running in debug mode,
 and if so, monkey patch (that is, grab the internals of, squeeze tight, then
 rip hard, just like monkeys do) Zope's MailHost class, meaning that *any and
 all* uses of a MailHost will be "fixed" so that instead of sending mail, it
-prints messages to the zope event log.
+prints messages to the zope event log. Optionally the individual emails can
+be saved to a location on the filesystem.
 
 This is useful if you don't have a local mailhost for testing, or if you
 prefer not to spam the crap out of yourself whilst finding out if your bulk
@@ -59,7 +60,7 @@ buildout, you can do this:
 
     [instance]
     ...
-    environment-vars = 
+    environment-vars =
         ...
         ENABLE_PRINTING_MAILHOST True
 
@@ -67,9 +68,20 @@ buildout, you can do this:
 
     [instance]
     ...
-    environment-vars = 
+    environment-vars =
         ...
         ENABLE_PRINTING_MAILHOST False
+
+- If you want to save emails to a filesystem location, specify
+the additional environment variable. Don't forget to enable the printing
+mailhost as well::
+
+    [instance]
+    ...
+    environment-vars =
+        ...
+        ENABLE_PRINTING_MAILHOST True
+        PRINTING_MAILHOST_SAVETO /var/www/debug-emails
 
 - Re-run buildout in order to make any of the above changes active::
 
