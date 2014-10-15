@@ -83,7 +83,7 @@ class PrintingMailHost:
             print >> out, ""
         value = out.getvalue()
         LOG.info(value)
-        if os.path.isdir(SAVETO) and os.access(SAVETO, os.W_OK):
+        if SAVETO and os.path.isdir(SAVETO) and os.access(SAVETO, os.W_OK):
             now = datetime.now().strftime('%Y%M%d-%H%M%S-%f.log')
             fname = os.path.join(SAVETO, now)
             open(fname, 'w').write(value)
