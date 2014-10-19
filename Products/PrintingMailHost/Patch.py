@@ -84,7 +84,7 @@ class PrintingMailHost:
         value = out.getvalue()
         LOG.info(value)
         if SAVETO and os.path.isdir(SAVETO) and os.access(SAVETO, os.W_OK):
-            now = datetime.now().strftime('%Y%M%d-%H%M%S-%f.log')
+            now = datetime.now().strftime('%Y%m%d-%H%M%S-%f.log')
             fname = os.path.join(SAVETO, now)
             open(fname, 'w').write(value)
 
